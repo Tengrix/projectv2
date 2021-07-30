@@ -11,9 +11,10 @@ type FormikErrorType = {
     password?: string
     rememberMe?: boolean
 }
-const Login = () =>{
+const Login = () => {
     const dispatch = useDispatch()
-    const isLoggedIn = useSelector<AppRootStateType,boolean>((state) => state.auth.isLoggedIn)
+    const isLoggedIn = useSelector<AppRootStateType, boolean>((state) => state.auth.isLoggedIn)
+
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -27,28 +28,34 @@ const Login = () =>{
             } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
                 errors.email = 'Invalid email address';
             }
-            if(!values.password){
+            if (!values.password) {
                 errors.password = 'Required'
-            }else if(values.password.length < 4){
+            } else if (values.password.length < 4) {
                 errors.password = 'Invalid password'
             }
             return errors;
         },
         onSubmit: values => {
-            dispatch(getLoginTC(values.email,values.password,values.rememberMe))
+            dispatch(getLoginTC(values.email, values.password, values.rememberMe))
             formik.resetForm();
         },
     })
-    if(isLoggedIn){
+    if (isLoggedIn) {
         return <Redirect to={PATH.profile}/>
     }
-    return(
+    return (
         <div>
             <form onSubmit={formik.handleSubmit}>
-                <input type={'email'} placeholder={'email'} {...formik.getFieldProps('email')} />
-                {formik.touched.email&& formik.errors.email && <div style={{color: 'red'}}>{formik.errors.email}</div>}
-                <input type={'password'} placeholder={'password'} {...formik.getFieldProps("password")} />
-                {formik.touched.password&& formik.errors.password && <div style={{color: 'red'}}>{formik.errors.password}</div>}
+                <div>
+                    <input type={'email'} placeholder={'email'} {...formik.getFieldProps('email')} />
+                    {formik.touched.email && formik.errors.email &&
+                    <div style={{color: 'red'}}>{formik.errors.email}</div>}
+                </div>
+                <div>
+                    <input type={'password'} placeholder={'password'} {...formik.getFieldProps("password")} />
+                    {formik.touched.password && formik.errors.password &&
+                    <div style={{color: 'red'}}>{formik.errors.password}</div>}
+                </div>
                 <input type="checkbox" {...formik.getFieldProps("rememberMe")} />
                 <button type={'submit'} color={'primary'}>Login</button>
             </form>

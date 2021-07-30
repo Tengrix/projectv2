@@ -12,44 +12,59 @@ type FormikErrorType = {
     rememberMe?: boolean
 }
 
-const Register = () =>{
+const Register = () => {
     const dispatch = useDispatch()
-    const isRegistered = useSelector<AppRootStateType,boolean>(state => state.auth.isRegistered)
+    const isRegistered = useSelector<AppRootStateType, boolean>(state => state.auth.isRegistered)
     const formik = useFormik({
-        initialValues:{
-            email:'',
-            password:''
+        initialValues: {
+            email: '',
+            password: '',
+            password_confirmation: ''
         },
-        validate:(values)=>{
+        validate: (values) => {
             const errors: FormikErrorType = {};
             if (!values.email) {
                 errors.email = 'Email is Required';
             } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
                 errors.email = 'Invalid email address';
             }
-            if(!values.password){
+            if (!values.password) {
                 errors.password = 'Password is Required'
-            }else if(values.password.length < 4){
+            } else if (values.password.length < 4) {
                 errors.password = 'Invalid password'
+            }
+            if (values.password_confirmation !== values.password) {
+                errors.password = 'Passwords should match'
             }
             return errors;
         },
-        onSubmit:values => {
+        onSubmit: values => {
             formik.resetForm()
-            dispatch(getRegisterTC(values.email,values.password))
+            dispatch(getRegisterTC(values.email, values.password))
 
         }
     })
-    if(isRegistered){
-       return <Redirect to={PATH.login}/>
+    if (isRegistered) {
+        return <Redirect to={PATH.login}/>
     }
-    return(
+    return (
         <div>
             <form onSubmit={formik.handleSubmit}>
-                <input type={'email'} placeholder={'email'} {...formik.getFieldProps('email')} />
-                {formik.touched.email&& formik.errors.email && <div style={{color: 'red'}}>{formik.errors.email}</div>}
-                <input type={'password'} placeholder={'password'} {...formik.getFieldProps("password")} />
-                {formik.touched.password&& formik.errors.password && <div style={{color: 'red'}}>{formik.errors.password}</div>}
+                <div>
+                    <input type={'email'} placeholder={'email'} {...formik.getFieldProps('email')} />
+                    {formik.touched.email && formik.errors.email &&
+                    <div style={{color: 'red'}}>{formik.errors.email}</div>}
+                </div>
+                <div>
+                    <input type={'password'} placeholder={'password'} {...formik.getFieldProps("password")} />
+                    {formik.touched.password && formik.errors.password &&
+                    <div style={{color: 'red'}}>{formik.errors.password}</div>}
+                </div>
+                <div>
+                    <input type={'password'} placeholder={'password'} {...formik.getFieldProps("password")} />
+                    {formik.touched.password_confirmation && formik.errors.password_confirmation &&
+                    <div style={{color: 'red'}}>{formik.errors.password_confirmation}</div>}
+                </div>
                 <button type={'submit'} color={'primary'}>Register</button>
             </form>
         </div>

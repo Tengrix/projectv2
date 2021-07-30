@@ -111,7 +111,8 @@ export const logOutTC = (() => (dispatch:Dispatch) =>{
 })
 export const getUserProfile = (() => (dispatch:Dispatch) =>{
     authAPI.me().then((res)=>{
-        dispatch(getUser({user:res.data}))
+        const {_id, name, email, avatar} = res.data
+        dispatch(getUser({user:{_id, name, email, avatar}}))
     })
         .catch((e)=>{
             const error = e.response? e.response.data.error:
