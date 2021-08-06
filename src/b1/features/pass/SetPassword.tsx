@@ -4,6 +4,7 @@ import {setPassTC} from "../../../a1-main/BLL/authReducer";
 import {useFormik} from "formik";
 import {Redirect, useParams} from 'react-router-dom';
 import {AppRootStateType} from "../../../a1-main/BLL/store";
+import {PATH} from "../../../a1-main/UI/Routes/Routes";
 type FormikErrorType = {
     email?: string
     password?: string
@@ -13,6 +14,7 @@ const SetPassword = () =>{
     const {token} = useParams<{token:string}>()
     const dispatch = useDispatch()
     const isUpdated = useSelector<AppRootStateType, boolean>(state => state.auth.isPassSet)
+    const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
     const formik = useFormik({
         initialValues:{
             password:''
@@ -31,7 +33,10 @@ const SetPassword = () =>{
         }
     })
     if(isUpdated){
-        return <Redirect to={'/login'}/>
+        return <Redirect to={PATH.login}/>
+    }
+    if (!isLoggedIn) {
+        return <Redirect to={PATH.login}/>
     }
 
     return(

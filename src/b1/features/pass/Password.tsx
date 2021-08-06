@@ -1,18 +1,19 @@
 import React from 'react'
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {forgotPassTC} from "../../../a1-main/BLL/authReducer";
 import {useFormik} from "formik";
+import {Redirect} from "react-router-dom";
+import {PATH} from "../../../a1-main/UI/Routes/Routes";
+import {AppRootStateType} from "../../../a1-main/BLL/store";
 type FormikErrorType = {
     email?: string
-    password?: string
-    rememberMe?: boolean
 }
 const Password = () =>{
     const dispatch = useDispatch()
+    const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
     const fromEmail ='nya-admin@nya.nya'
-    const msg = 'Please get new pass'
-
-    const formik = useFormik({
+    const msg = `<div style="background-color: lime; padding: 15px">error: string;password recovery link:<a href='http://tengrix.github.io/projectv2/#/set-pass/$token$'>link</a></div>`
+        const formik = useFormik({
         initialValues:{
             email:''
         },
@@ -29,6 +30,9 @@ const Password = () =>{
             formik.resetForm()
         }
     })
+    if (!isLoggedIn) {
+        return <Redirect to={PATH.login}/>
+    }
 
     return(
         <div>

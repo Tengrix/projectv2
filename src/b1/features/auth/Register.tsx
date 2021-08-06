@@ -9,12 +9,12 @@ import {PATH} from "../../../a1-main/UI/Routes/Routes";
 type FormikErrorType = {
     email?: string
     password?: string
-    rememberMe?: boolean
 }
 
 const Register = () => {
     const dispatch = useDispatch()
     const isRegistered = useSelector<AppRootStateType, boolean>(state => state.auth.isRegistered)
+    const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -47,6 +47,9 @@ const Register = () => {
     if (isRegistered) {
         return <Redirect to={PATH.login}/>
     }
+    if (!isLoggedIn) {
+        return <Redirect to={PATH.login}/>
+    }
     return (
         <div>
             <form onSubmit={formik.handleSubmit}>
@@ -61,7 +64,7 @@ const Register = () => {
                     <div style={{color: 'red'}}>{formik.errors.password}</div>}
                 </div>
                 <div>
-                    <input type={'password'} placeholder={'password'} {...formik.getFieldProps("password")} />
+                    <input type={'password'} placeholder={'password'} {...formik.getFieldProps("password_confirmation")} />
                     {formik.touched.password_confirmation && formik.errors.password_confirmation &&
                     <div style={{color: 'red'}}>{formik.errors.password_confirmation}</div>}
                 </div>

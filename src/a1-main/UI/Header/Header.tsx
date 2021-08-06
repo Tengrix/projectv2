@@ -1,8 +1,6 @@
 import React from 'react'
 import {NavLink} from "react-router-dom"
 import {PATH} from '../Routes/Routes'
-import {useSelector} from "react-redux";
-import {AppRootStateType} from "../../BLL/store";
 import {
     Navbar,
     Nav,
@@ -10,10 +8,9 @@ import {
 } from 'reactstrap';
 
 const Header = () => {
-    const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
     return (
         <div>
-            {isLoggedIn &&
+
             <Navbar color="light" light expand="md">
                 <Nav className="mr-auto" navbar>
                     <NavItem>
@@ -31,9 +28,12 @@ const Header = () => {
                     <NavItem>
                         <NavLink to={PATH.setPassword}>Set Password</NavLink>
                     </NavItem>
+                    <NavItem>
+                        <NavLink to={PATH.packs}>Packs</NavLink>
+                    </NavItem>
                 </Nav>
             </Navbar>
-            }
+
         </div>
     )
 }
