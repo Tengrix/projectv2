@@ -5,13 +5,17 @@ import {useDispatch, useSelector} from "react-redux";
 import {updCardTC} from "../../../a1-main/BLL/cardReducer";
 import {AppRootStateType} from "../../../a1-main/BLL/store";
 import {RequestStatusType} from "../../../a1-main/BLL/authReducer";
+import UpdateCard from "./UpdateCard";
+import AddNewCard from "./AddNewCard";
+import {Redirect} from "react-router-dom";
+import {PATH} from "../../../a1-main/UI/Routes/Routes";
 
 type CardType = {
     card: cardType;
     delCardHandler:(id:string)=>void;
     id:string;
     packId:string;
-    addNewCard:(id:string)=>void;
+    addNewCard:(id:string,question:string, answer:string)=>void;
     status:RequestStatusType
 }
 const Card = (props: CardType) => {
@@ -21,10 +25,7 @@ const Card = (props: CardType) => {
     const showHandler = () => {
         setShow(!show)
     }
-    const [newQuestion, setNewQuestion] = useState<string>('')
-    const questionUpdHandler = (e:ChangeEvent<HTMLInputElement>) => {
-        setNewQuestion(e.currentTarget.value)
-    }
+
     const updCard = (id:string,question:string, packId:string ) => {
         dispatch(updCardTC(id,question,packId))
     }
@@ -45,16 +46,12 @@ const Card = (props: CardType) => {
             </TableCell>
             {isChecked &&
                 <TableCell>
-                    <TableCell align="left">
                         <button disabled={props.status==='loading'} onClick={()=>props.delCardHandler(props.id)}>del</button>
-                    </TableCell>
-                    <TableCell align="left">
-                        <input disabled={props.status==='loading'} type="text" value={newQuestion} onChange={questionUpdHandler}/>
-                        <button disabled={props.status==='loading'} onClick={()=>updCard(props.id,newQuestion,props.packId)}>upd</button>
-                    </TableCell>
-                    <TableCell>
-                        <button disabled={props.status==='loading'} onClick={()=>props.addNewCard(props.packId)}>add</button>
-                    </TableCell>
+                      <UpdateCard
+                          updCard={updCard}
+                          status={props.status}
+                          id={props.id}
+                          packId={props.packId}/>
                 </TableCell>
 
             }

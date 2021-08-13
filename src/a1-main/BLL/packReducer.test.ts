@@ -11,6 +11,8 @@ type initialStateType = {
     pageCount:number;
     sortCardsPacks:"0name" | "1name" | "0cardsCount" | "1cardsCount"|'1updated'|'0updated'|'0created'|'1created';
     user_id:string;
+    newPageForShow: number,
+    currentPortionToPaginator: number,
     newCardsPack:{
         name:string
     },
@@ -23,10 +25,12 @@ const state:initialStateType = {
     myCardsPack:false,
     isDeleted:false,
     cardPacksTotalCount:14,
-    maxCardsCount:1,
+    maxCardsCount:103,
     minCardsCount:0,
     page:1,
     pageCount:10,
+    newPageForShow: 1,
+    currentPortionToPaginator: 1,
     sortCardsPacks: "0cardsCount",
     user_id:'',
     newCardsPack:{

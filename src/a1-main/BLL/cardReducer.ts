@@ -2,27 +2,43 @@ import {createSlice, PayloadAction, ThunkDispatch} from "@reduxjs/toolkit";
 import {cardAPI, cardType, createCardType, getCardResponseType, GetCardsModuleType} from "../DAL/mainAPI";
 import {Dispatch} from "redux";
 import {AppRootStateType} from "./store";
-type initialStateType = {
+export type cardInitialStateType = {
     cards:cardType[]
     cardsTotalCount:number;
     maxGrade:number;
     minGrade:number;
     page:number;
+    currentPortionToPaginator:number;
     pageCount:number;
     packUserId:string;
-    sortCards:'0grade'|'1grade'|'0shot'|'1shot';
-    newCardCreated:boolean;
+    sortCards:'0grade'|'1grade'|'0shots'|'1shots';
+    newCardCreated:{
+        answer:string,
+        question:string
+    }
+    search:boolean;
+    updatedGrade:{
+        grade:number,
+    }
 }
-const initialState:initialStateType = {
+const initialState:cardInitialStateType = {
     cards:[],
     cardsTotalCount:3,
     maxGrade:5,
     minGrade:1,
     page:1,
     pageCount:10,
+    currentPortionToPaginator:1,
     packUserId:'',
     sortCards:'0grade',
-    newCardCreated:false
+    newCardCreated:{
+        answer:'',
+        question:''
+    },
+    search:false,
+    updatedGrade:{
+        grade:0,
+    }
 }
 const slice = createSlice({
     name:'cardReducer',
@@ -37,15 +53,25 @@ const slice = createSlice({
             state.maxGrade = action.payload.cardData.maxGrade
             state.minGrade = action.payload.cardData.minGrade
         },
-        sortCards(state,action:PayloadAction<{value:'0grade'|'1grade'|'0shot'|'1shot'}>){
+        sortCards(state,action:PayloadAction<{value:'0grade'|'1grade'|'0shots'|'1shots'}>){
             state.sortCards = action.payload.value
         },
-        newCard(state,action:PayloadAction<{value:boolean}>){
-            state.newCardCreated = action.payload.value
-        }
+        newCard(state,action:PayloadAction<{question:string, answer:string}>){
+            state.newCardCreated.answer = action.payload.answer
+            state.newCardCreated.question = action.payload.question
+        },
+        setSearchQuestion(state,action:PayloadAction<{keyWord:string}>){
+            state.cards = state.cards.filter(el=>el.question.search(action.payload.keyWord))
+        },
+        setNewCardsPage(state,action:PayloadAction<{newShowPage:number}>){
+            state.page = action.payload.newShowPage
+        },
+        setNewCardsPortion(state,action:PayloadAction<{currentPortion:number}>){
+            state.currentPortionToPaginator = action.payload.currentPortion
+        },
     }
 })
-export const {getCards,sortCards,newCard} = slice.actions
+export const {getCards,sortCards,newCard,setSearchQuestion,setNewCardsPortion,setNewCardsPage} = slice.actions
 export const cardReducer = slice.reducer
 
 export const getCardsTC = (packId:string) => (dispatch:Dispatch,getState:()=>AppRootStateType) =>{
@@ -64,15 +90,15 @@ export const getCardsTC = (packId:string) => (dispatch:Dispatch,getState:()=>App
         dispatch(getCards({cardData:res.data}))
     })
 }
-export const createCardTC = (packId:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>, getState:()=>AppRootStateType) =>{
+export const createCardTC = (packId:string,question:string, answer:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>, getState:()=>AppRootStateType) =>{
     let state = getState()
     let getNewCard:createCardType = {
             _id:state.auth.user._id,
             cardsPack_id:packId,
             grade:0,
             shots:0,
-            answer:'no answer',
-            question:'no question'
+            answer:answer,
+            question:question
     }
     cardAPI.createCard(getNewCard).then((res)=>{
         dispatch(getCardsTC(packId))
@@ -82,8 +108,13 @@ export const delCardTC = (id:string) => () =>{
     cardAPI.deleteCard(id).then(()=>{
     })
 }
-export const updCardTC = (id:string,question:string,packId:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>, getState:()=>AppRootStateType) => {
+export const updCardTC = (id:string,question:string,packId:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>) => {
     cardAPI.updateCard(id,question).then(()=>{
+        dispatch(getCardsTC(packId))
+    })
+}
+export const getGradeTC = (grade:number,id:string,packId:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>) =>{
+    cardAPI.getGrade(grade, id).then(()=>{
         dispatch(getCardsTC(packId))
     })
 }

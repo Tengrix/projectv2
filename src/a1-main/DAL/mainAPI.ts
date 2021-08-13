@@ -54,6 +54,9 @@ export const cardAPI = {
     },
     updateCard(_id:string,question:string){
         return instance.put('cards/card',{card: {_id,question}})
+    },
+    getGrade(grade:number,card_id:string){
+        return instance.put('cards/grade',{grade,card_id})
     }
 }
 export type createCardType = {
@@ -71,7 +74,7 @@ export type GetCardsModuleType = {
         cardsPack_id?: string;
         min?: number;
         max?: number;
-        sortCards?: '0grade' | '1grade' | '0shot' | '1shot'
+        sortCards?: '0grade' | '1grade' | '0shots' | '1shots'
         page?: number;
         pageCount?: number;
     }

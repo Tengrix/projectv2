@@ -8,7 +8,7 @@ import {
 import {Dispatch} from "redux";
 import {AppRootStateType} from "./store";
 import {setAppStatusAC} from "./authReducer";
-type initialStateType = {
+export type initialStateType = {
     cardPacks:cardPacksType[];
     myCardsPack:boolean;
     isDeleted:boolean;
@@ -19,6 +19,8 @@ type initialStateType = {
     pageCount:number;
     sortCardsPacks:"0name" | "1name" | "0cardsCount" | "1cardsCount"|'1updated'|'0updated'|'0created'|'1created';
     user_id:string;
+    newPageForShow: number,
+    currentPortionToPaginator: number,
     newCardsPack:{
         name:string
     },
@@ -31,10 +33,12 @@ const initialState:initialStateType = {
     myCardsPack:false,
     isDeleted:false,
     cardPacksTotalCount:14,
-    maxCardsCount:1,
+    maxCardsCount:103,
     minCardsCount:0,
     page:1,
     pageCount:10,
+    newPageForShow: 1,
+    currentPortionToPaginator: 1,
     sortCardsPacks: "0cardsCount",
     user_id:'',
     newCardsPack:{
@@ -72,9 +76,15 @@ const slice = createSlice({
         updatePackName(state,action:PayloadAction<{name:string}>){
             state.updatedCardsPack.name = action.payload.name
         },
+        setNewPage(state,action:PayloadAction<{newShowPage:number}>){
+            state.page = action.payload.newShowPage
+        },
+        setNewPortion(state,action:PayloadAction<{currentPortion:number}>){
+            state.currentPortionToPaginator = action.payload.currentPortion
+        }
     }
 })
-export const {getPacks,getNewPack,changeSort,checkMyPack,delPacks,updatePackName} = slice.actions
+export const {getPacks,getNewPack,changeSort,checkMyPack,delPacks,updatePackName,setNewPage,setNewPortion} = slice.actions
 export const packReducer = slice.reducer
 
 export const getPacksTC = () => (dispatch:Dispatch, getState:()=>AppRootStateType) =>{
@@ -93,8 +103,6 @@ export const getPacksTC = () => (dispatch:Dispatch, getState:()=>AppRootStateTyp
     }
     if(state.packs.myCardsPack){
         packData.params.user_id = state.auth.user._id
-    }else{
-        packData.params.user_id = ''
     }
     packAPI.cardsPack(packData).then(res=>{
         dispatch(getPacks({packsData:res.data}))

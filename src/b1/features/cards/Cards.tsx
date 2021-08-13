@@ -1,21 +1,34 @@
 import {useDispatch, useSelector} from "react-redux";
-import React, {useEffect} from "react";
-import {createCardTC, delCardTC, getCardsTC, sortCards} from "../../../a1-main/BLL/cardReducer";
+import React, {ChangeEvent, useEffect, useState} from "react";
+import {
+    cardInitialStateType,
+    createCardTC,
+    delCardTC,
+    getCardsTC, setNewCardsPage, setNewCardsPortion,
+    sortCards
+} from "../../../a1-main/BLL/cardReducer";
 import {AppRootStateType} from "../../../a1-main/BLL/store";
-import {cardType} from "../../../a1-main/DAL/mainAPI";
 import {Redirect, useParams} from "react-router-dom";
 import Card from "./Card";
 import {PATH} from "../../../a1-main/UI/Routes/Routes";
 import {Paper, Table, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import {makeStyles} from "@material-ui/styles";
 import {RequestStatusType} from "../../../a1-main/BLL/authReducer";
+import SearchPack from "../packs/searchPack";
+import {TablePaginationActions} from "../packs/TablePagination";
+import {getPacksTC} from "../../../a1-main/BLL/packReducer";
+import AddNewCard from "./AddNewCard";
+import LearningCards from "../LearnMode/LearningCards";
 
 const Cards = () => {
     const dispatch = useDispatch()
-    const cards = useSelector<AppRootStateType, cardType[]>(state => state.cards.cards)
+    const cards = useSelector<AppRootStateType, cardInitialStateType>(state => state.cards)
     const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
     const status = useSelector<AppRootStateType,RequestStatusType>(state => state.auth.status)
     const {packID} = useParams<{ packID: string }>()
+
+    const [question,setQuestion] = useState<string>('')
+    const [answer,setAnswer] = useState<string>('')
     const useStyles = makeStyles({
         table: {
             minWidth: 650,
@@ -23,14 +36,14 @@ const Cards = () => {
     });
     const classes = useStyles();
     useEffect(() => {
-        dispatch(getCardsTC(packID))
+        getSortedCards('1grade')
     }, [dispatch,packID])
-    const getSortedCards = (name: '0grade' | '1grade' | '0shot' | '1shot') => {
+    const getSortedCards = (name: '0grade' | '1grade' | '0shots' | '1shots') => {
         dispatch(sortCards({value: name}))
         dispatch(getCardsTC(packID))
     }
-    const addNewCard = (id:string) => {
-        dispatch(createCardTC(id))
+    const addNewCard = (id:string,question:string, answer:string) => {
+        dispatch(createCardTC(id,question,answer))
     }
     if (!isLoggedIn) {
         return <Redirect to={PATH.login}/>
@@ -39,19 +52,34 @@ const Cards = () => {
         dispatch(delCardTC(id))
         dispatch(getCardsTC(packID))
     }
-    // if(!isCreated){
-    //     return <div>loading</div>
-    // }
+    const onChangeSearchHandler = (e:ChangeEvent<HTMLInputElement>) =>{
+        setQuestion(e.currentTarget.value)
+    }
+    const paginate = (newPage:number,currentPortion:number) => {
+        dispatch(setNewCardsPage({newShowPage:newPage}))
+        dispatch(setNewCardsPortion({currentPortion:currentPortion}))
+        dispatch(getCardsTC(packID))
+    }
+
     return (
         <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
                 <TableHead>
+                    <div>
+                        <LearningCards status={status}
+                                       packId={packID}
+                        />
+                    </div>
+                    <SearchPack
+                        question={question}
+                        onChange={onChangeSearchHandler}
+                    />
                     <TableRow>
                         <TableCell>Questions</TableCell>
                         <TableCell align="left">Answers</TableCell>
                         <TableCell align="left">
-                            <button disabled={status==='loading'} onClick={() => getSortedCards('1shot')}>↑</button>
-                            <button disabled={status==='loading'} onClick={() => getSortedCards('0shot')}>↓</button>
+                            <button disabled={status==='loading'} onClick={() => getSortedCards('1shots')}>↑</button>
+                            <button disabled={status==='loading'} onClick={() => getSortedCards('0shots')}>↓</button>
                             Shots
                         </TableCell>
                         <TableCell align="left">
@@ -59,10 +87,15 @@ const Cards = () => {
                             <button disabled={status==='loading'} onClick={() => getSortedCards('0grade')}>↓</button>
                             Grades
                         </TableCell>
-
+                        <TableCell>
+                            <AddNewCard
+                                packId={packID}
+                                addNewCard={addNewCard}
+                                status={status}/>
+                        </TableCell>
                     </TableRow>
                 </TableHead>
-                {cards.length && cards.map((el) =>
+                {cards.cards.length && cards.cards.map((el) =>
                     <Card
                         key={el._id}
                         id={el._id}
@@ -73,6 +106,14 @@ const Cards = () => {
                         status={status}
                     />)}
             </Table>
+            <TablePaginationActions
+                rowsPerPage={10}
+                totalNumberOfPacks={cards.cardsTotalCount}
+                page={cards.page}
+                onChangePaginate={paginate}
+                portionSize={5}
+                currentPortion={cards.currentPortionToPaginator}
+            />
         </TableContainer>
     )
 }

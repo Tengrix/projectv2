@@ -1,4 +1,4 @@
-import {cardReducer, getCards, newCard, sortCards} from "./cardReducer";
+import {cardReducer, newCard, sortCards} from "./cardReducer";
 import {cardType} from "../DAL/mainAPI";
 type initialStateType = {
     cards:cardType[]
@@ -22,7 +22,6 @@ const state:initialStateType = {
     sortCards:'0grade',
     newCardCreated:false
 }
-
 test('sortCards',()=>{
     let action = sortCards({value:'0grade'})
     let newState = cardReducer(state,action)
