@@ -6,9 +6,6 @@ import {updCardTC} from "../../../a1-main/BLL/cardReducer";
 import {AppRootStateType} from "../../../a1-main/BLL/store";
 import {RequestStatusType} from "../../../a1-main/BLL/authReducer";
 import UpdateCard from "./UpdateCard";
-import AddNewCard from "./AddNewCard";
-import {Redirect} from "react-router-dom";
-import {PATH} from "../../../a1-main/UI/Routes/Routes";
 
 type CardType = {
     card: cardType;

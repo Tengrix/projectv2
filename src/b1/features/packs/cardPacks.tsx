@@ -16,7 +16,6 @@ import {PATH} from "../../../a1-main/UI/Routes/Routes";
 import CardPacksPage from "./cardPacksPage";
 import {RequestStatusType} from "../../../a1-main/BLL/authReducer";
 import {TablePaginationActions} from "./TablePagination";
-import SearchPack from "./searchPack";
 import CreateNewPack from "./addNewPack";
 
 const CardPacks = () => {
@@ -25,9 +24,8 @@ const CardPacks = () => {
     const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
     const isChecked = useSelector<AppRootStateType, boolean>(state => state.packs.myCardsPack)
     const cardData = useSelector<AppRootStateType,initialStateType>(state => state.packs)
-
+    const [savedData,setSavedData] = useState()
     const [checked, setChecked] = useState<boolean>(isChecked)
-
     const useStyles = makeStyles({
         table: {
             minWidth: 650,
@@ -49,6 +47,14 @@ const CardPacks = () => {
         setChecked(newValue)
         dispatch(checkMyPack({value: newValue}))
         dispatch(getPacksTC())
+        if(newValue){
+            localStorage.setItem('mypack',String(true))
+        }
+    let checked = localStorage.getItem('mypack')
+
+        if(checked===String(true)){
+            setChecked(true)
+        }
     }
     const newPackSortByName = (name: "0name" | "1name" | "0cardsCount" | "1cardsCount" | '1updated' | '0updated' | '0created' | '1created') => {
         dispatch(changeSort({newSort: name}))
@@ -60,9 +66,7 @@ const CardPacks = () => {
         dispatch(getPacksTC())
     }
 
-
     return (
-
         <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
                 <TableHead>

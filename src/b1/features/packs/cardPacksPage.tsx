@@ -103,7 +103,7 @@ const CardPacksPage = (props: cardPacksPageType) => {
             </TableCell>
             }
             <NavLink to={'/cards/' + props.packs._id}>
-                <button disabled={props.status === 'loading'}>learn</button>
+                <button disabled={props.status === 'loading'}>explore</button>
             </NavLink>
         </TableBody>
     )
