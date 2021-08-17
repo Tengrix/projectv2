@@ -47,14 +47,6 @@ const CardPacks = () => {
         setChecked(newValue)
         dispatch(checkMyPack({value: newValue}))
         dispatch(getPacksTC())
-        if(newValue){
-            localStorage.setItem('mypack',String(true))
-        }
-    let checked = localStorage.getItem('mypack')
-
-        if(checked===String(true)){
-            setChecked(true)
-        }
     }
     const newPackSortByName = (name: "0name" | "1name" | "0cardsCount" | "1cardsCount" | '1updated' | '0updated' | '0created' | '1created') => {
         dispatch(changeSort({newSort: name}))

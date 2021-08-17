@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "../../../a1-main/BLL/store";
 import {cardType} from "../../../a1-main/DAL/mainAPI";
 import React, {useState} from "react";
-import {getGradeTC} from "../../../a1-main/BLL/cardReducer";
+import {getCardsTC, getGradeTC, setLearningModeOn} from "../../../a1-main/BLL/cardReducer";
 import {Button, makeStyles, Modal} from "@material-ui/core";
 import {RequestStatusType} from "../../../a1-main/BLL/authReducer";
 
@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
 const LearningCards = (props: LearningCardsType) => {
     const dispatch = useDispatch()
     const cards = useSelector<AppRootStateType, cardType[]>(state => state.cards.cards)
+    const cardsTotal = useSelector<AppRootStateType,number>(state => state.cards.cardsTotalCount)
     const [numQA, setNumQA] = useState<number>(0)
     const [countA, setCountA] = useState<number>(1)
     const grade = ["super easy", "easy", "just fine", "hard", "super hard"]
@@ -52,8 +53,9 @@ const LearningCards = (props: LearningCardsType) => {
 
     const handleOpen = () => {
         setOpen(true);
+        dispatch(setLearningModeOn({modeOn:true}))
+        dispatch(getCardsTC(props.packId))
     };
-
     const handleClose = () => {
         setOpen(false);
     };
@@ -78,7 +80,6 @@ const LearningCards = (props: LearningCardsType) => {
         setCountA(countA + 1)
         if (randomQ) {
             setNumQA(out[Math.floor(Math.random() * out.length)])
-            console.log(out[Math.floor(Math.random() * out.length)])
             setCountA(countA + 1)
         }
     }
@@ -95,8 +96,7 @@ const LearningCards = (props: LearningCardsType) => {
             <h2 id="simple-modal-title">Learn "Pack Name"</h2>
             <div id="simple-modal-description">
                 <span>
-                    Question number: {countA}/{cards.length}{" "}
-
+                    Question number: {countA}/{cardsTotal}{" "}
                 </span>
                 <div>{randomQ ? out[Math.floor(Math.random() * out.length)] : getAllRandomQuestion[numQA]}</div>
                 <div>
@@ -112,7 +112,7 @@ const LearningCards = (props: LearningCardsType) => {
                 <div>{show ? getAllAnswers[numQA] : ""}</div>
             </div>
             <div>
-                {countA === cards.length ? (
+                {countA === cardsTotal ? (
                         <Button
                             color="secondary"
                             variant={"outlined"}
@@ -138,7 +138,7 @@ const LearningCards = (props: LearningCardsType) => {
             <Button color="secondary" variant="outlined" onClick={handleClose}>
                 Cancel
             </Button>
-            {countA === cards.length ? (
+            {countA === cardsTotal ? (
                 <Button
                     color="primary"
                     variant={"outlined"}
@@ -168,6 +168,7 @@ const LearningCards = (props: LearningCardsType) => {
     return (
         <div>
             <div>
+
                 <Button
                     variant="outlined"
                     color="primary"

@@ -16,10 +16,14 @@ export type cardInitialStateType = {
         answer:string,
         question:string
     }
-    search:boolean;
+    search: {
+        answer:string,
+        question:string
+    }
     updatedGrade:{
         grade:number,
-    }
+    },
+    learningMode:boolean;
 }
 const initialState:cardInitialStateType = {
     cards:[],
@@ -35,10 +39,14 @@ const initialState:cardInitialStateType = {
         answer:'',
         question:''
     },
-    search:false,
+    search: {
+        answer:'',
+        question:''
+    },
     updatedGrade:{
         grade:0,
-    }
+    },
+    learningMode:false
 }
 const slice = createSlice({
     name:'cardReducer',
@@ -60,8 +68,9 @@ const slice = createSlice({
             state.newCardCreated.answer = action.payload.answer
             state.newCardCreated.question = action.payload.question
         },
-        setSearchQuestion(state,action:PayloadAction<{keyWord:string}>){
-            state.cards = state.cards.filter(el=>el.question.search(action.payload.keyWord))
+        setSearchQuestion(state,action:PayloadAction<{keyWordForQuestion:string, keyWordForAnswer:string}>){
+            state.search.question = action.payload.keyWordForQuestion
+            state.search.answer = action.payload.keyWordForAnswer
         },
         setNewCardsPage(state,action:PayloadAction<{newShowPage:number}>){
             state.page = action.payload.newShowPage
@@ -69,24 +78,33 @@ const slice = createSlice({
         setNewCardsPortion(state,action:PayloadAction<{currentPortion:number}>){
             state.currentPortionToPaginator = action.payload.currentPortion
         },
+        setLearningModeOn(state,action:PayloadAction<{modeOn:boolean}>){
+            state.learningMode = action.payload.modeOn
+        }
     }
 })
-export const {getCards,sortCards,newCard,setSearchQuestion,setNewCardsPortion,setNewCardsPage} = slice.actions
+export const {getCards,sortCards,newCard,setSearchQuestion,setNewCardsPortion,setNewCardsPage,setLearningModeOn} = slice.actions
 export const cardReducer = slice.reducer
 
 export const getCardsTC = (packId:string) => (dispatch:Dispatch,getState:()=>AppRootStateType) =>{
     let state = getState()
     const cardData:GetCardsModuleType = {
         params:{
-            min:state.cards.minGrade,
-            max:state.cards.maxGrade,
             page:state.cards.page,
             sortCards:state.cards.sortCards,
             pageCount:state.cards.pageCount,
-            cardsPack_id:packId
+            cardsPack_id:packId,
+            cardQuestion:state.cards.search.question,
+            cardAnswer:state.cards.search.answer,
         }
     }
-    cardAPI.getCards(cardData).then((res)=>{
+    const learnMode:GetCardsModuleType ={
+        params:{
+            cardsPack_id:packId,
+            pageCount:state.cards.cardsTotalCount
+        }
+    }
+    cardAPI.getCards(state.cards.learningMode?learnMode:cardData).then((res)=>{
         dispatch(getCards({cardData:res.data}))
     })
 }
@@ -108,8 +126,8 @@ export const delCardTC = (id:string) => () =>{
     cardAPI.deleteCard(id).then(()=>{
     })
 }
-export const updCardTC = (id:string,question:string,packId:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>) => {
-    cardAPI.updateCard(id,question).then(()=>{
+export const updCardTC = (id:string,question:string,answer:string,packId:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>) => {
+    cardAPI.updateCard(id,question,answer).then(()=>{
         dispatch(getCardsTC(packId))
     })
 }

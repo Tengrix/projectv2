@@ -93,9 +93,7 @@ export const getPacksTC = () => (dispatch:Dispatch, getState:()=>AppRootStateTyp
     const packData:GetCardsPacksModuleType = {
         params:{
             page:state.packs.page,
-            max:state.packs.maxCardsCount,
             pageCount:state.packs.pageCount,
-            min:state.packs.minCardsCount,
             sortPacks:state.packs.sortCardsPacks,
             user_id:state.packs.user_id,
             cardPacksTotalCount:state.packs.cardPacksTotalCount

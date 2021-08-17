@@ -6,6 +6,7 @@ import {updCardTC} from "../../../a1-main/BLL/cardReducer";
 import {AppRootStateType} from "../../../a1-main/BLL/store";
 import {RequestStatusType} from "../../../a1-main/BLL/authReducer";
 import UpdateCard from "./UpdateCard";
+import DeleteCard from "./DeleteCard";
 
 type CardType = {
     card: cardType;
@@ -23,8 +24,8 @@ const Card = (props: CardType) => {
         setShow(!show)
     }
 
-    const updCard = (id:string,question:string, packId:string ) => {
-        dispatch(updCardTC(id,question,packId))
+    const updCard = (id:string,question:string,answer:string,packId:string) => {
+        dispatch(updCardTC(id,question,answer,packId))
     }
     return (
         <TableBody>
@@ -43,12 +44,19 @@ const Card = (props: CardType) => {
             </TableCell>
             {isChecked &&
                 <TableCell>
-                        <button disabled={props.status==='loading'} onClick={()=>props.delCardHandler(props.id)}>del</button>
+                        <DeleteCard
+                            status={props.status}
+                            deleteCard={props.delCardHandler}
+                            id={props.id}
+                        />
                       <UpdateCard
                           updCard={updCard}
                           status={props.status}
                           id={props.id}
-                          packId={props.packId}/>
+                          packId={props.packId}
+                          question={props.card.question}
+                          answer={props.card.answer}
+                      />
                 </TableCell>
 
             }

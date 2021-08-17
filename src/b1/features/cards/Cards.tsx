@@ -4,7 +4,7 @@ import {
     cardInitialStateType,
     createCardTC,
     delCardTC,
-    getCardsTC, setNewCardsPage, setNewCardsPortion,
+    getCardsTC, setNewCardsPage, setNewCardsPortion, setSearchQuestion,
     sortCards
 } from "../../../a1-main/BLL/cardReducer";
 import {AppRootStateType} from "../../../a1-main/BLL/store";
@@ -14,11 +14,10 @@ import {PATH} from "../../../a1-main/UI/Routes/Routes";
 import {Paper, Table, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import {makeStyles} from "@material-ui/styles";
 import {RequestStatusType} from "../../../a1-main/BLL/authReducer";
-import SearchPack from "../packs/searchPack";
 import {TablePaginationActions} from "../packs/TablePagination";
-import {getPacksTC} from "../../../a1-main/BLL/packReducer";
 import AddNewCard from "./AddNewCard";
 import LearningCards from "../LearnMode/LearningCards";
+import SearchCard from "./searchCard";
 
 const Cards = () => {
     const dispatch = useDispatch()
@@ -26,9 +25,6 @@ const Cards = () => {
     const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
     const status = useSelector<AppRootStateType,RequestStatusType>(state => state.auth.status)
     const {packID} = useParams<{ packID: string }>()
-
-    const [question,setQuestion] = useState<string>('')
-    const [answer,setAnswer] = useState<string>('')
     const useStyles = makeStyles({
         table: {
             minWidth: 650,
@@ -52,15 +48,17 @@ const Cards = () => {
         dispatch(delCardTC(id))
         dispatch(getCardsTC(packID))
     }
-    const onChangeSearchHandler = (e:ChangeEvent<HTMLInputElement>) =>{
-        setQuestion(e.currentTarget.value)
-    }
+
     const paginate = (newPage:number,currentPortion:number) => {
         dispatch(setNewCardsPage({newShowPage:newPage}))
         dispatch(setNewCardsPortion({currentPortion:currentPortion}))
         dispatch(getCardsTC(packID))
     }
+    const searchQuestion = (question:string,answer:string) => {
+        dispatch(setSearchQuestion({keyWordForQuestion:question, keyWordForAnswer:answer}))
+        dispatch(getCardsTC(packID))
 
+    }
     return (
         <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
@@ -70,9 +68,9 @@ const Cards = () => {
                                        packId={packID}
                         />
                     </div>
-                    <SearchPack
-                        question={question}
-                        onChange={onChangeSearchHandler}
+                    <SearchCard
+                        search={searchQuestion}
+                        packID={packID}
                     />
                     <TableRow>
                         <TableCell>Questions</TableCell>

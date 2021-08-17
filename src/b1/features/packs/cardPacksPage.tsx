@@ -43,10 +43,11 @@ const CardPacksPage = (props: cardPacksPageType) => {
     const dispatch = useDispatch()
 
     const [edit, setEdit] = useState<boolean>(true)
-    const [newName, setNewName] = useState<string>('')
+    const [newName, setNewName] = useState<string>(props.packs.name)
     const classes = useStyles();
     const [modalStyle] = React.useState(getModalStyle);
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState<boolean>(false);
+    const [del,setDel] = useState<boolean>(false)
 
     const handleOpen = () => {
         setOpen(true);
@@ -55,7 +56,6 @@ const CardPacksPage = (props: cardPacksPageType) => {
     const handleClose = () => {
         setOpen(false);
     };
-
     const deletePack = (id: string) => {
         dispatch(delPack(id))
     }
@@ -63,20 +63,25 @@ const CardPacksPage = (props: cardPacksPageType) => {
         dispatch(updatePackName({name: newName}))
         dispatch(updatePack(id, name))
     }
-    const editHandler = () => {
-        setEdit(!edit)
-    }
     const body = (
         <div style={modalStyle} className={classes.paper}>
-            <button disabled={props.status === 'loading'} onClick={() => editHandler()}>edit</button>
-            <button disabled={props.status === 'loading'} onClick={() => deletePack(props.packs._id)}>del</button>
-            {!edit ?
-            <span>
-                <input type="text" value={newName} onChange={(e) => setNewName(e.currentTarget.value)}/>
+            <input type="text" value={newName} onChange={(e) => setNewName(e.currentTarget.value)}/>
+            <button disabled={props.status === 'loading'} onClick={()=>setDel(true)}>del</button>
+            {edit ?
+                <span>
                 <button disabled={props.status === 'loading'} onClick={() => updPack(props.packs._id, newName)}>save
             </button>
             </span>
-                 : ''}
+                : ''}
+            { del?
+            <div>
+            Are you sure?
+            <button disabled={props.status === 'loading'} onClick={() => deletePack(props.packs._id)}>yes</button>
+            <button disabled={props.status === 'loading'} onClick={()=>setDel(false)}>no</button>
+
+        </div>:''}
+
+
         </div>
     )
     return (
