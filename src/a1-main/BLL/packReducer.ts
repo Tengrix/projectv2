@@ -8,6 +8,7 @@ import {
 import {Dispatch} from "redux";
 import {AppRootStateType} from "./store";
 import {setAppStatusAC} from "./authReducer";
+export type PackSortType = "0name" | "1name" | "0cardsCount" | "1cardsCount"|'1updated'|'0updated'|'0created'|'1created'
 export type initialStateType = {
     cardPacks:cardPacksType[];
     myCardsPack:boolean;
@@ -17,7 +18,7 @@ export type initialStateType = {
     minCardsCount:number;
     page:number;
     pageCount:number;
-    sortCardsPacks:"0name" | "1name" | "0cardsCount" | "1cardsCount"|'1updated'|'0updated'|'0created'|'1created';
+    sortCardsPacks:PackSortType;
     user_id:string;
     newPageForShow: number,
     currentPortionToPaginator: number,
@@ -64,7 +65,7 @@ const slice = createSlice({
         getNewPack(state,action:PayloadAction<{ name: string }>){
             state.newCardsPack.name = action.payload.name
         },
-        changeSort(state, action:PayloadAction<{newSort:"0name" | "1name" | "0cardsCount" | "1cardsCount"|'1updated'|'0updated'|'0created'|'1created'}>){
+        changeSort(state, action:PayloadAction<{newSort:PackSortType}>){
             state.sortCardsPacks = action.payload.newSort
         },
         checkMyPack(state,action:PayloadAction<{value:boolean}>){

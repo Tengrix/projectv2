@@ -1,6 +1,6 @@
 import {cardType} from "../../../a1-main/DAL/mainAPI";
 import {TableBody, TableCell} from "@material-ui/core";
-import React, {ChangeEvent, useState} from "react";
+import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {updCardTC} from "../../../a1-main/BLL/cardReducer";
 import {AppRootStateType} from "../../../a1-main/BLL/store";

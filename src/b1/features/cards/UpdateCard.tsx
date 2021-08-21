@@ -64,7 +64,7 @@ const UpdateCard = (props:UpdateCardType) => {
     )
     return (
         <div>
-            <button type="button" onClick={handleOpen}>
+            <button type="button" disabled={props.status === 'loading'} onClick={handleOpen}>
                 update Card
             </button>
             <Modal

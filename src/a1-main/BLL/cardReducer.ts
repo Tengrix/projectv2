@@ -2,6 +2,8 @@ import {createSlice, PayloadAction, ThunkDispatch} from "@reduxjs/toolkit";
 import {cardAPI, cardType, createCardType, getCardResponseType, GetCardsModuleType} from "../DAL/mainAPI";
 import {Dispatch} from "redux";
 import {AppRootStateType} from "./store";
+import {setAppStatusAC} from "./authReducer";
+export type sortCardsType = '0grade'|'1grade'|'0shots'|'1shots'
 export type cardInitialStateType = {
     cards:cardType[]
     cardsTotalCount:number;
@@ -11,7 +13,7 @@ export type cardInitialStateType = {
     currentPortionToPaginator:number;
     pageCount:number;
     packUserId:string;
-    sortCards:'0grade'|'1grade'|'0shots'|'1shots';
+    sortCards:sortCardsType;
     newCardCreated:{
         answer:string,
         question:string
@@ -61,7 +63,7 @@ const slice = createSlice({
             state.maxGrade = action.payload.cardData.maxGrade
             state.minGrade = action.payload.cardData.minGrade
         },
-        sortCards(state,action:PayloadAction<{value:'0grade'|'1grade'|'0shots'|'1shots'}>){
+        sortCards(state,action:PayloadAction<{value:sortCardsType}>){
             state.sortCards = action.payload.value
         },
         newCard(state,action:PayloadAction<{question:string, answer:string}>){
@@ -87,6 +89,7 @@ export const {getCards,sortCards,newCard,setSearchQuestion,setNewCardsPortion,se
 export const cardReducer = slice.reducer
 
 export const getCardsTC = (packId:string) => (dispatch:Dispatch,getState:()=>AppRootStateType) =>{
+    dispatch(setAppStatusAC({status:'loading'}))
     let state = getState()
     const cardData:GetCardsModuleType = {
         params:{
@@ -106,9 +109,11 @@ export const getCardsTC = (packId:string) => (dispatch:Dispatch,getState:()=>App
     }
     cardAPI.getCards(state.cards.learningMode?learnMode:cardData).then((res)=>{
         dispatch(getCards({cardData:res.data}))
+        dispatch(setAppStatusAC({status:'succeeded'}))
     })
 }
 export const createCardTC = (packId:string,question:string, answer:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>, getState:()=>AppRootStateType) =>{
+
     let state = getState()
     let getNewCard:createCardType = {
             _id:state.auth.user._id,
@@ -118,21 +123,29 @@ export const createCardTC = (packId:string,question:string, answer:string) => (d
             answer:answer,
             question:question
     }
+    dispatch(setAppStatusAC({status:'loading'}))
     cardAPI.createCard(getNewCard).then((res)=>{
         dispatch(getCardsTC(packId))
+        dispatch(setAppStatusAC({status:'succeeded'}))
     })
 }
-export const delCardTC = (id:string) => () =>{
+export const delCardTC = (id:string) => (dispatch:Dispatch) =>{
+    dispatch(setAppStatusAC({status:'loading'}))
     cardAPI.deleteCard(id).then(()=>{
+        dispatch(setAppStatusAC({status:'succeeded'}))
     })
 }
 export const updCardTC = (id:string,question:string,answer:string,packId:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>) => {
+    dispatch(setAppStatusAC({status:'loading'}))
     cardAPI.updateCard(id,question,answer).then(()=>{
         dispatch(getCardsTC(packId))
+        dispatch(setAppStatusAC({status:'succeeded'}))
     })
 }
 export const getGradeTC = (grade:number,id:string,packId:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>) =>{
+    dispatch(setAppStatusAC({status:'loading'}))
     cardAPI.getGrade(grade, id).then(()=>{
         dispatch(getCardsTC(packId))
+        dispatch(setAppStatusAC({status:'succeeded'}))
     })
 }

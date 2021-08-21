@@ -58,7 +58,7 @@ const DeleteCard = (props:DeleteCardType) => {
     )
     return(
         <div>
-            <button type="button" onClick={handleOpen}>
+            <button disabled={props.status === 'loading'} type="button" onClick={handleOpen}>
                 delete card
             </button>
 
