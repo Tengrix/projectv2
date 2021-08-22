@@ -17,7 +17,8 @@ const SetPassword = () =>{
     const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
     const formik = useFormik({
         initialValues:{
-            password:''
+            password:'',
+            token:token
         },
         validate:(values)=>{
             const errors: FormikErrorType = {};
@@ -28,7 +29,7 @@ const SetPassword = () =>{
             }
         },
         onSubmit:values => {
-            dispatch(setPassTC(values.password, token))
+            dispatch(setPassTC(values))
             formik.resetForm()
         }
     })

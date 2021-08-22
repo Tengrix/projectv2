@@ -36,7 +36,7 @@ const Login = () => {
             return errors;
         },
         onSubmit: values => {
-            dispatch(getLoginTC(values.email, values.password, values.rememberMe))
+            dispatch(getLoginTC(values))
             formik.resetForm();
         },
     })

@@ -5,19 +5,22 @@ import {useFormik} from "formik";
 import {Redirect} from "react-router-dom";
 import {PATH} from "../../../a1-main/UI/Routes/Routes";
 import {AppRootStateType} from "../../../a1-main/BLL/store";
+
 type FormikErrorType = {
     email?: string
 }
-const Password = () =>{
+const Password = () => {
     const dispatch = useDispatch()
     const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
-    const fromEmail ='nya-admin@nya.nya'
+    const fromEmail = 'nya-admin@nya.nya'
     const msg = `<div style="background-color: lime; padding: 15px">error: string;password recovery link:<a href='http://tengrix.github.io/projectv2/#/set-pass/$token$'>link</a></div>`
-        const formik = useFormik({
-        initialValues:{
-            email:''
+    const formik = useFormik({
+        initialValues: {
+            email: '',
+            from: fromEmail,
+            message: msg
         },
-        validate:(values)=>{
+        validate: (values) => {
             const errors: FormikErrorType = {};
             if (!values.email) {
                 errors.email = 'Required';
@@ -25,8 +28,8 @@ const Password = () =>{
                 errors.email = 'Invalid email address';
             }
         },
-        onSubmit:values => {
-            dispatch(forgotPassTC(values.email, fromEmail,msg))
+        onSubmit: values => {
+            dispatch(forgotPassTC(values))
             formik.resetForm()
         }
     })
@@ -34,11 +37,11 @@ const Password = () =>{
         return <Redirect to={PATH.login}/>
     }
 
-    return(
+    return (
         <div>
             <form onSubmit={formik.handleSubmit} action="">
                 <input type={'email'} placeholder={'email'} {...formik.getFieldProps('email')} />
-                {formik.touched.email&& formik.errors.email && <div style={{color: 'red'}}>{formik.errors.email}</div>}
+                {formik.touched.email && formik.errors.email && <div style={{color: 'red'}}>{formik.errors.email}</div>}
                 <button type={'submit'}>Submit</button>
             </form>
         </div>

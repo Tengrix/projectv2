@@ -40,7 +40,7 @@ const Register = () => {
         },
         onSubmit: values => {
             formik.resetForm()
-            dispatch(getRegisterTC(values.email, values.password))
+            dispatch(getRegisterTC(values))
 
         }
     })
