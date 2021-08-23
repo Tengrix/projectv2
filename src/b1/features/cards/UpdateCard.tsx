@@ -4,7 +4,7 @@ import {makeStyles, Modal} from "@material-ui/core";
 
 type UpdateCardType = {
     status:RequestStatusType;
-    updCard:(id:string, question:string, answer:string, packId:string)=>void;
+    updCard:(params:{id: string, question: string, answer: string, packId: string})=>void;
     id:string;
     packId:string;
     question:string;
@@ -41,11 +41,15 @@ const UpdateCard = (props:UpdateCardType) => {
     const classes = useStyles();
     const [modalStyle] = React.useState(getModalStyle);
     const [open, setOpen] = React.useState(false);
-
+    const params = {
+        id:props.id,
+        question:newQuestion,
+        answer:newAnswer,
+        packId:props.packId
+    }
     const handleOpen = () => {
         setOpen(true);
     };
-
     const handleClose = () => {
         setOpen(false);
     };
@@ -55,11 +59,15 @@ const UpdateCard = (props:UpdateCardType) => {
     const answerUpdHandler = (e:ChangeEvent<HTMLInputElement>) => {
         setNewAnswer(e.currentTarget.value)
     }
+    const updateCard = () => {
+        props.updCard(params)
+        setOpen(false)
+    }
     const body = (
         <div style={modalStyle} className={classes.paper}>
             <input disabled={props.status==='loading'} placeholder={'New Question'} type="text" value={newQuestion} onChange={questionUpdHandler}/>
             <input disabled={props.status==='loading'} placeholder={'New Question'} type="text" value={newAnswer} onChange={answerUpdHandler}/>
-            <button disabled={props.status==='loading'} onClick={()=>props.updCard(props.id,newQuestion,newAnswer,props.packId)}>upd</button>
+            <button disabled={props.status==='loading'} onClick={updateCard}>upd</button>
         </div>
     )
     return (

@@ -48,7 +48,10 @@ const CardPacksPage = (props: cardPacksPageType) => {
     const [modalStyle] = React.useState(getModalStyle);
     const [open, setOpen] = useState<boolean>(false);
     const [del,setDel] = useState<boolean>(false)
-
+    const param = {
+        id:props.packs._id,
+        name:newName
+    }
     const handleOpen = () => {
         setOpen(true);
     };
@@ -59,9 +62,10 @@ const CardPacksPage = (props: cardPacksPageType) => {
     const deletePack = (id: string) => {
         dispatch(delPack(id))
     }
-    const updPack = (id: string, name: string) => {
+    const updPack = (param:{id: string, name: string}) => {
         dispatch(updatePackName({name: newName}))
-        dispatch(updatePack(id, name))
+        dispatch(updatePack(param))
+        setOpen(false)
     }
     const body = (
         <div style={modalStyle} className={classes.paper}>
@@ -69,7 +73,7 @@ const CardPacksPage = (props: cardPacksPageType) => {
             <button disabled={props.status === 'loading'} onClick={()=>setDel(true)}>del</button>
             {edit ?
                 <span>
-                <button disabled={props.status === 'loading'} onClick={() => updPack(props.packs._id, newName)}>save
+                <button disabled={props.status === 'loading'} onClick={() => updPack(param)}>save
             </button>
             </span>
                 : ''}

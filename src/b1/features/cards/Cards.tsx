@@ -23,9 +23,10 @@ import s from '../../../common/cards.module.css'
 const Cards = () => {
     const dispatch = useDispatch()
     const cards = useSelector<AppRootStateType, cardInitialStateType>(state => state.cards)
-    const sortCard = useSelector<AppRootStateType,sortCardsType>(state => state.cards.sortCards)
+    const sortCard = useSelector<AppRootStateType, sortCardsType>(state => state.cards.sortCards)
     const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
-    const status = useSelector<AppRootStateType,RequestStatusType>(state => state.auth.status)
+    const status = useSelector<AppRootStateType, RequestStatusType>(state => state.auth.status)
+    const isChecked = useSelector<AppRootStateType, boolean>(state => state.packs.myCardsPack)
     const {packID} = useParams<{ packID: string }>()
     const useStyles = makeStyles({
         table: {
@@ -35,30 +36,30 @@ const Cards = () => {
     const classes = useStyles();
     useEffect(() => {
         getSortedCards('1grade')
-    }, [dispatch,packID])
+    }, [dispatch, packID])
 
     const getSortedCards = (name: sortCardsType) => {
         dispatch(sortCards({value: name}))
         dispatch(getCardsTC(packID))
     }
-    const addNewCard = (id:string,question:string, answer:string) => {
-        dispatch(createCardTC(id,question,answer))
+    const addNewCard = (params: { packId: string, question: string, answer: string }) => {
+        dispatch(createCardTC(params))
     }
     if (!isLoggedIn) {
         return <Redirect to={PATH.login}/>
     }
-    const delCardHandler = (id:string) =>{
+    const delCardHandler = (id: string) => {
         dispatch(delCardTC(id))
         dispatch(getCardsTC(packID))
     }
 
-    const paginate = (newPage:number,currentPortion:number) => {
-        dispatch(setNewCardsPage({newShowPage:newPage}))
-        dispatch(setNewCardsPortion({currentPortion:currentPortion}))
+    const paginate = (newPage: number, currentPortion: number) => {
+        dispatch(setNewCardsPage({newShowPage: newPage}))
+        dispatch(setNewCardsPortion({currentPortion: currentPortion}))
         dispatch(getCardsTC(packID))
     }
-    const searchQuestion = (question:string,answer:string) => {
-        dispatch(setSearchQuestion({keyWordForQuestion:question, keyWordForAnswer:answer}))
+    const searchQuestion = (question: string, answer: string) => {
+        dispatch(setSearchQuestion({keyWordForQuestion: question, keyWordForAnswer: answer}))
         dispatch(getCardsTC(packID))
     }
     return (
@@ -78,20 +79,32 @@ const Cards = () => {
                         <TableCell>Questions</TableCell>
                         <TableCell align="left">Answers</TableCell>
                         <TableCell align="left">
-                            <button className={sortCard==="1shots"?s.button:''} disabled={status==='loading'} onClick={() => getSortedCards('1shots')}>↑</button>
-                            <button className={sortCard==="0shots"?s.button:''} disabled={status==='loading'} onClick={() => getSortedCards('0shots')}>↓</button>
+                            <button className={sortCard === "1shots" ? s.button : ''} disabled={status === 'loading'}
+                                    onClick={() => getSortedCards('1shots')}>↑
+                            </button>
+                            <button className={sortCard === "0shots" ? s.button : ''} disabled={status === 'loading'}
+                                    onClick={() => getSortedCards('0shots')}>↓
+                            </button>
                             Shots
                         </TableCell>
                         <TableCell align="left">
-                            <button className={sortCard==="1grade"?s.button:''} disabled={status==='loading'} onClick={() => getSortedCards('1grade')}>↑</button>
-                            <button className={sortCard==="0grade"?s.button:''} disabled={status==='loading'} onClick={() => getSortedCards('0grade')}>↓</button>
+                            <button className={sortCard === "1grade" ? s.button : ''} disabled={status === 'loading'}
+                                    onClick={() => getSortedCards('1grade')}>↑
+                            </button>
+                            <button className={sortCard === "0grade" ? s.button : ''} disabled={status === 'loading'}
+                                    onClick={() => getSortedCards('0grade')}>↓
+                            </button>
                             Grades
                         </TableCell>
                         <TableCell>
-                            <AddNewCard
-                                packId={packID}
-                                addNewCard={addNewCard}
-                                status={status}/>
+                            {
+                                isChecked &&
+                                <AddNewCard
+                                    packId={packID}
+                                    addNewCard={addNewCard}
+                                    status={status}/>
+                            }
+
                         </TableCell>
                     </TableRow>
                 </TableHead>
@@ -102,7 +115,6 @@ const Cards = () => {
                         card={el}
                         delCardHandler={delCardHandler}
                         packId={packID}
-                        addNewCard={addNewCard}
                         status={status}
                     />)}
             </Table>

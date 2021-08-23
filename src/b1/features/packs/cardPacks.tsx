@@ -4,8 +4,11 @@ import {
     changeSort,
     checkMyPack,
     createNewPack,
-    getPacksTC, initialStateType, PackSortType,
-    setNewPage, setNewPortion,
+    getPacksTC,
+    initialStateType,
+    PackSortType,
+    setNewPage,
+    setNewPortion,
 } from "../../../a1-main/BLL/packReducer";
 import {AppRootStateType} from "../../../a1-main/BLL/store";
 import {Table} from "reactstrap";
@@ -18,14 +21,15 @@ import {RequestStatusType} from "../../../a1-main/BLL/authReducer";
 import {TablePaginationActions} from "./TablePagination";
 import CreateNewPack from "./addNewPack";
 import s from '../../../common/cards.module.css'
+
 const CardPacks = () => {
     const dispatch = useDispatch()
-    const status = useSelector<AppRootStateType,RequestStatusType>(state => state.auth.status)
+    const status = useSelector<AppRootStateType, RequestStatusType>(state => state.auth.status)
     const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
     const isChecked = useSelector<AppRootStateType, boolean>(state => state.packs.myCardsPack)
-    const cardData = useSelector<AppRootStateType,initialStateType>(state => state.packs)
+    const cardData = useSelector<AppRootStateType, initialStateType>(state => state.packs)
     const sortPack = useSelector<AppRootStateType, PackSortType>(state => state.packs.sortCardsPacks)
-    const [savedData,setSavedData] = useState()
+    const [savedData, setSavedData] = useState()
     const [checked, setChecked] = useState<boolean>(isChecked)
     const useStyles = makeStyles({
         table: {
@@ -53,9 +57,9 @@ const CardPacks = () => {
         dispatch(changeSort({newSort: name}))
         dispatch(getPacksTC())
     }
-    const paginate = (newPage:number,currentPortion:number) => {
-        dispatch(setNewPage({newShowPage:newPage}))
-        dispatch(setNewPortion({currentPortion:currentPortion}))
+    const paginate = (newPage: number, currentPortion: number) => {
+        dispatch(setNewPage({newShowPage: newPage}))
+        dispatch(setNewPortion({currentPortion: currentPortion}))
         dispatch(getPacksTC())
     }
 
@@ -63,40 +67,59 @@ const CardPacks = () => {
         <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
                 <TableHead>
-                   My pack <input type="checkbox" checked={checked} onChange={isItMyPack}/>
+                    My pack <input type="checkbox" checked={checked} onChange={isItMyPack}/>
                     <TableRow>
                         <TableCell>
-                            <button className={sortPack==="1name"?s.button:''} disabled={status==='loading'} onClick={() => newPackSortByName('1name')}>↑</button>
-                            <button className={sortPack==="0name"?s.button:''} disabled={status==='loading'} onClick={() => newPackSortByName('0name')}>↓</button>
+                            <button className={sortPack === "1name" ? s.button : ''} disabled={status === 'loading'}
+                                    onClick={() => newPackSortByName('1name')}>↑
+                            </button>
+                            <button className={sortPack === "0name" ? s.button : ''} disabled={status === 'loading'}
+                                    onClick={() => newPackSortByName('0name')}>↓
+                            </button>
                             Name</TableCell>
                         <TableCell align="right">
-                            <button className={sortPack==="0cardsCount"?s.button:''} disabled={status==='loading'} onClick={() => newPackSortByName('0cardsCount')}>↑</button>
-                            <button className={sortPack==="1cardsCount"?s.button:''} disabled={status==='loading'} onClick={() => newPackSortByName('1cardsCount')}>↓</button>
+                            <button className={sortPack === "0cardsCount" ? s.button : ''}
+                                    disabled={status === 'loading'} onClick={() => newPackSortByName('0cardsCount')}>↑
+                            </button>
+                            <button className={sortPack === "1cardsCount" ? s.button : ''}
+                                    disabled={status === 'loading'} onClick={() => newPackSortByName('1cardsCount')}>↓
+                            </button>
                             Cards Count</TableCell>
                         <TableCell align="right">
-                            <button className={sortPack==="1created"?s.button:''} disabled={status==='loading'} onClick={() => newPackSortByName('1created')}>↑</button>
-                            <button className={sortPack==="0created"?s.button:''} disabled={status==='loading'} onClick={() => newPackSortByName('0created')}>↓</button>
+                            <button className={sortPack === "1created" ? s.button : ''} disabled={status === 'loading'}
+                                    onClick={() => newPackSortByName('1created')}>↑
+                            </button>
+                            <button className={sortPack === "0created" ? s.button : ''} disabled={status === 'loading'}
+                                    onClick={() => newPackSortByName('0created')}>↓
+                            </button>
                             Created</TableCell>
                         <TableCell align="right">
-                            <button className={sortPack==="1updated"?s.button:''} disabled={status==='loading'} onClick={() => newPackSortByName('1updated')}>↑</button>
-                            <button className={sortPack==="0updated"?s.button:''} disabled={status==='loading'} onClick={() => newPackSortByName('0updated')}>↓</button>
+                            <button className={sortPack === "1updated" ? s.button : ''} disabled={status === 'loading'}
+                                    onClick={() => newPackSortByName('1updated')}>↑
+                            </button>
+                            <button className={sortPack === "0updated" ? s.button : ''} disabled={status === 'loading'}
+                                    onClick={() => newPackSortByName('0updated')}>↓
+                            </button>
                             Updated</TableCell>
                         <TableCell align="right">
-                            <CreateNewPack
-                                newPackHandler={newPackHandler}
-                                packData={cardData}
-                                status={status}/>
+                            {
+                                isChecked && <CreateNewPack
+                                    newPackHandler={newPackHandler}
+                                    packData={cardData}
+                                    status={status}/>
+                            }
+
                         </TableCell>
                     </TableRow>
                 </TableHead>
-                    {cardData.cardPacks.map((el) => (
-                         <CardPacksPage
-                             key={el._id}
-                             packs={el}
-                             isChecked={isChecked}
-                             status={status}
-                         />
-                    ))}
+                {cardData.cardPacks.map((el) => (
+                    <CardPacksPage
+                        key={el._id}
+                        packs={el}
+                        isChecked={isChecked}
+                        status={status}
+                    />
+                ))}
             </Table>
             <TablePaginationActions
                 rowsPerPage={10}

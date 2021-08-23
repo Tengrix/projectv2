@@ -1,4 +1,4 @@
-import {createSlice, PayloadAction, ThunkDispatch} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, PayloadAction, ThunkDispatch} from "@reduxjs/toolkit";
 import {cardAPI, cardType, createCardType, getCardResponseType, GetCardsModuleType} from "../DAL/mainAPI";
 import {Dispatch} from "redux";
 import {AppRootStateType} from "./store";
@@ -50,6 +50,96 @@ const initialState:cardInitialStateType = {
     },
     learningMode:false
 }
+
+export const getCardsTC = createAsyncThunk('cards/getCards', async (packId:string, thunkAPI)=>{
+    thunkAPI.dispatch(setAppStatusAC({status:'loading'}))
+    let state = thunkAPI.getState() as AppRootStateType
+    const cardData:GetCardsModuleType = {
+        params:{
+            page:state.cards.page,
+            sortCards:state.cards.sortCards,
+            pageCount:state.cards.pageCount,
+            cardsPack_id:packId,
+            cardQuestion:state.cards.search.question,
+            cardAnswer:state.cards.search.answer,
+        }
+    }
+    const learnMode:GetCardsModuleType ={
+        params:{
+            cardsPack_id:packId,
+            pageCount:state.cards.cardsTotalCount
+        }
+    }
+    try{
+        const res = await cardAPI.getCards(state.cards.learningMode?learnMode:cardData)
+        thunkAPI.dispatch(getCards({cardData:res.data}))
+        thunkAPI.dispatch(setAppStatusAC({status:'succeeded'}))
+    }catch (e){
+        const error = e.response ? e.response.data.error :
+            (e.message + ',more details in the console')
+        console.log('Error: ', {...e})
+    }
+
+})
+export const createCardTC = createAsyncThunk('cards/createCard', async (params:{packId:string,question:string, answer:string}, thunkAPI)=>{
+    let state = thunkAPI.getState() as AppRootStateType
+    let getNewCard:createCardType = {
+        _id:state.auth.user._id,
+        cardsPack_id:params.packId,
+        grade:0,
+        shots:0,
+        answer:params.answer,
+        question:params.question
+    }
+    thunkAPI.dispatch(setAppStatusAC({status:'loading'}))
+    try {
+        const res = await cardAPI.createCard(getNewCard)
+        thunkAPI.dispatch(getCardsTC(params.packId))
+        thunkAPI.dispatch(setAppStatusAC({status:'succeeded'}))
+    }catch (e){
+        const error = e.response ? e.response.data.error :
+            (e.message + ',more details in the console')
+        console.log('Error: ', {...e})
+    }
+})
+export const delCardTC = createAsyncThunk('cards/delCard', async (id:string, thunkAPI)=>{
+    thunkAPI.dispatch(setAppStatusAC({status:'loading'}))
+    try{
+        const res = await cardAPI.deleteCard(id)
+        thunkAPI.dispatch(setAppStatusAC({status:'succeeded'}))
+    }catch (e){
+        const error = e.response ? e.response.data.error :
+            (e.message + ',more details in the console')
+        console.log('Error: ', {...e})
+    }
+})
+export const updCardTC = createAsyncThunk('cards/updCard', async (params:{id:string,question:string,answer:string,packId:string}, thunkAPI)=>{
+    thunkAPI.dispatch(setAppStatusAC({status:'loading'}))
+    try{
+        const res = await cardAPI.updateCard(params.id,params.question,params.answer)
+        thunkAPI.dispatch(getCardsTC(params.packId))
+        thunkAPI.dispatch(setAppStatusAC({status:'succeeded'}))
+    }catch (e){
+        const error = e.response ? e.response.data.error :
+            (e.message + ',more details in the console')
+        console.log('Error: ', {...e})
+    }
+
+})
+export const getGradeTC = createAsyncThunk('cards/getGrade', async (params:{grade:number,id:string,packId:string}, thunkAPI)=>{
+    thunkAPI.dispatch(setAppStatusAC({status:'loading'}))
+    try {
+        const res = await cardAPI.getGrade(params.grade, params.id)
+        thunkAPI.dispatch(getCardsTC(params.packId))
+        thunkAPI.dispatch(setAppStatusAC({status:'succeeded'}))
+    }catch (e){
+        const error = e.response ? e.response.data.error :
+            (e.message + ',more details in the console')
+        console.log('Error: ', {...e})
+    }
+})
+
+
 const slice = createSlice({
     name:'cardReducer',
     initialState: initialState,
@@ -88,64 +178,3 @@ const slice = createSlice({
 export const {getCards,sortCards,newCard,setSearchQuestion,setNewCardsPortion,setNewCardsPage,setLearningModeOn} = slice.actions
 export const cardReducer = slice.reducer
 
-export const getCardsTC = (packId:string) => (dispatch:Dispatch,getState:()=>AppRootStateType) =>{
-    dispatch(setAppStatusAC({status:'loading'}))
-    let state = getState()
-    const cardData:GetCardsModuleType = {
-        params:{
-            page:state.cards.page,
-            sortCards:state.cards.sortCards,
-            pageCount:state.cards.pageCount,
-            cardsPack_id:packId,
-            cardQuestion:state.cards.search.question,
-            cardAnswer:state.cards.search.answer,
-        }
-    }
-    const learnMode:GetCardsModuleType ={
-        params:{
-            cardsPack_id:packId,
-            pageCount:state.cards.cardsTotalCount
-        }
-    }
-    cardAPI.getCards(state.cards.learningMode?learnMode:cardData).then((res)=>{
-        dispatch(getCards({cardData:res.data}))
-        dispatch(setAppStatusAC({status:'succeeded'}))
-    })
-}
-export const createCardTC = (packId:string,question:string, answer:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>, getState:()=>AppRootStateType) =>{
-
-    let state = getState()
-    let getNewCard:createCardType = {
-            _id:state.auth.user._id,
-            cardsPack_id:packId,
-            grade:0,
-            shots:0,
-            answer:answer,
-            question:question
-    }
-    dispatch(setAppStatusAC({status:'loading'}))
-    cardAPI.createCard(getNewCard).then((res)=>{
-        dispatch(getCardsTC(packId))
-        dispatch(setAppStatusAC({status:'succeeded'}))
-    })
-}
-export const delCardTC = (id:string) => (dispatch:Dispatch) =>{
-    dispatch(setAppStatusAC({status:'loading'}))
-    cardAPI.deleteCard(id).then(()=>{
-        dispatch(setAppStatusAC({status:'succeeded'}))
-    })
-}
-export const updCardTC = (id:string,question:string,answer:string,packId:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>) => {
-    dispatch(setAppStatusAC({status:'loading'}))
-    cardAPI.updateCard(id,question,answer).then(()=>{
-        dispatch(getCardsTC(packId))
-        dispatch(setAppStatusAC({status:'succeeded'}))
-    })
-}
-export const getGradeTC = (grade:number,id:string,packId:string) => (dispatch:ThunkDispatch<void,AppRootStateType,any>) =>{
-    dispatch(setAppStatusAC({status:'loading'}))
-    cardAPI.getGrade(grade, id).then(()=>{
-        dispatch(getCardsTC(packId))
-        dispatch(setAppStatusAC({status:'succeeded'}))
-    })
-}

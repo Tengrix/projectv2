@@ -2,7 +2,7 @@ import {authAPI, userType} from "../DAL/mainAPI";
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 
 export type RequestStatusType = 'idle' | 'loading' | 'succeeded' | 'failed'
-type initialStateType = {
+export type AuthInitialStateType = {
     isLoggedIn: boolean;
     isRegistered: boolean;
     isInitialized: boolean;
@@ -12,7 +12,7 @@ type initialStateType = {
     isPassSet: boolean,
     status: RequestStatusType
 }
-const initialState: initialStateType = {
+const initialState: AuthInitialStateType = {
     isLoggedIn: false,
     isRegistered: false,
     isInitialized: false,

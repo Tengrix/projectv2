@@ -51,10 +51,14 @@ const CreateNewPack = (props:CreateNewPackType) => {
     const onChangeName = (e: ChangeEvent<HTMLInputElement>) => {
         setTitle(e.currentTarget.value)
     }
+    const addNewPack = (title:string) => {
+        props.newPackHandler(title)
+        setOpen(false)
+    }
     const body = (
     <div style={modalStyle} className={classes.paper}>
         <input disabled={props.status==='loading'} placeholder={'New Pack'} type="text" value={title} onChange={onChangeName}/>
-        <button disabled={props.status==='loading'} onClick={() => props.newPackHandler(title)}>add</button>
+        <button disabled={props.status==='loading'} onClick={() => addNewPack(title)}>add</button>
     </div>
     )
     return(

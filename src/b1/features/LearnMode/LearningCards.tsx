@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 const LearningCards = (props: LearningCardsType) => {
     const dispatch = useDispatch()
     const cards = useSelector<AppRootStateType, cardType[]>(state => state.cards.cards)
-    const cardsTotal = useSelector<AppRootStateType,number>(state => state.cards.cardsTotalCount)
+    const cardsTotal = useSelector<AppRootStateType, number>(state => state.cards.cardsTotalCount)
     const [numQA, setNumQA] = useState<number>(0)
     const [countA, setCountA] = useState<number>(1)
     const grade = ["super easy", "easy", "just fine", "hard", "super hard"]
@@ -53,7 +53,7 @@ const LearningCards = (props: LearningCardsType) => {
 
     const handleOpen = () => {
         setOpen(true);
-        dispatch(setLearningModeOn({modeOn:true}))
+        dispatch(setLearningModeOn({modeOn: true}))
         dispatch(getCardsTC(props.packId))
     };
     const handleClose = () => {
@@ -88,7 +88,12 @@ const LearningCards = (props: LearningCardsType) => {
         setCountA(1)
     }
     const newGrades = (grade: number, id: string, packId: string) => {
-        dispatch(getGradeTC(grade, id, packId))
+        const params = {
+            grade,
+            id,
+            packId
+        }
+        dispatch(getGradeTC(params))
         nextQuestion()
     }
     const body = (
@@ -112,7 +117,7 @@ const LearningCards = (props: LearningCardsType) => {
                 <div>{show ? getAllAnswers[numQA] : ""}</div>
             </div>
             <div>
-                {countA === cardsTotal ? (
+                {countA === cardsTotal+1 ? (
                         <Button
                             color="secondary"
                             variant={"outlined"}

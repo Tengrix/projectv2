@@ -13,7 +13,6 @@ type CardType = {
     delCardHandler:(id:string)=>void;
     id:string;
     packId:string;
-    addNewCard:(id:string,question:string, answer:string)=>void;
     status:RequestStatusType
 }
 const Card = (props: CardType) => {
@@ -24,8 +23,8 @@ const Card = (props: CardType) => {
         setShow(!show)
     }
 
-    const updCard = (id:string,question:string,answer:string,packId:string) => {
-        dispatch(updCardTC(id,question,answer,packId))
+    const updCard = (params:{id: string, question: string, answer: string, packId: string}) => {
+        dispatch(updCardTC(params))
     }
     return (
         <TableBody>

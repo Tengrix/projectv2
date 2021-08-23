@@ -3,7 +3,7 @@ import {RequestStatusType} from "../../../a1-main/BLL/authReducer";
 import {makeStyles, Modal} from "@material-ui/core";
 
 type AddNewCardType = {
-    addNewCard:(id:string, question:string, answer:string)=>void
+    addNewCard:(params:{packId: string, question: string, answer: string})=>void
     status:RequestStatusType;
     packId:string
 }
@@ -38,7 +38,11 @@ const AddNewCard = (props:AddNewCardType) => {
     const classes = useStyles();
     const [modalStyle] = React.useState(getModalStyle);
     const [open, setOpen] = React.useState(false);
-
+    const params = {
+        packId:props.packId,
+        question:newQuestion,
+        answer:newAnswer
+    }
     const handleOpen = () => {
         setOpen(true);
     };
@@ -46,11 +50,15 @@ const AddNewCard = (props:AddNewCardType) => {
     const handleClose = () => {
         setOpen(false);
     };
+    const addNewCard = (params:{packId: string, question: string, answer: string}) => {
+        props.addNewCard(params)
+        setOpen(false)
+    }
     const body = (
         <div style={modalStyle} className={classes.paper}>
         <input type="text" value={newQuestion} placeholder={'New Question'} onChange={event => setNewQuestion(event.currentTarget.value)}/>
         <input type="text" value={newAnswer} placeholder={'New Answer'} onChange={event => setNewAnswer(event.currentTarget.value)}/>
-        <button disabled={props.status==='loading'} onClick={()=>props.addNewCard(props.packId,newQuestion,newAnswer)}>add</button>
+        <button disabled={props.status==='loading'} onClick={()=>addNewCard(params)}>add</button>
     </div>)
     return (
         <div>
